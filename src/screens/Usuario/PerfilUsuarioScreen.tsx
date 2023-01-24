@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Alert, Button, Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CustomSwitch } from '../../components/CustomSwitch';
@@ -27,7 +27,12 @@ export const PerfilUsuario = () => {
         return <LoadingScreen/>
     }
     
-
+    useEffect(() => {
+        console.log('usuario desde context',user);
+      return () => {
+        
+      };
+    }, [])
     const {top} = useSafeAreaInsets();
     const [editState, setEditState] = useState({
         edit : false
@@ -35,17 +40,10 @@ export const PerfilUsuario = () => {
     
     /*DESDE REGISTER SCREEN */
 
-    const {email, nombre, cedula, /*fecha_nacimiento,*/  estado_civil, religion, ocupacion, lugar_nacimiento, residencia, domicilio, telefono, estado,  username,onChange} = useForm({
+    const {email, nombre, cedula_identidad, telefono, estado,  username,onChange} = useForm({
         email : user.email,
-        nombre : user.nombre,
-        cedula : user.cedula,
-        /*fecha_nacimiento : '2018/10/22',*/
-        estado_civil: user.estado_civil,
-        religion : user.religion,
-        ocupacion : user.ocupacion,
-        lugar_nacimiento : user.lugar_nacimiento,
-        residencia : user.residencia,
-        domicilio : user.domicilio,
+        nombre : `${user.primer_nombre} ${user.apellido_paterno}`,
+        cedula : user.cedula_identidad,
         telefono : user.telefono,
         estado : '1',
         username : user.username,
@@ -110,12 +108,6 @@ export const PerfilUsuario = () => {
             dermatologiaApi.put('usuarios/' + user?._id, {
                 nombre,
                 cedula,
-                estado_civil, 
-                religion, 
-                ocupacion, 
-                lugar_nacimiento, 
-                residencia, 
-                domicilio, 
                 telefono, 
                 imagen : user.imagen,
                 username,  
@@ -151,12 +143,6 @@ export const PerfilUsuario = () => {
                 dermatologiaApi.put('usuarios/' + user?._id, {
                     nombre,
                     cedula,
-                    estado_civil, 
-                    religion, 
-                    ocupacion, 
-                    lugar_nacimiento, 
-                    residencia, 
-                    domicilio, 
                     telefono, 
                     estado :'1',
                     imagen : linkImagen,
@@ -188,28 +174,6 @@ export const PerfilUsuario = () => {
             })  
         }
        
-        /*
-
-       console.log(nombre,cedula,sex,estado_civil, religion,  ocupacion,lugar_nacimiento,  residencia, domicilio, telefono,  image,   username,     email,  password);
-        signUp({
-            nombre,
-            cedula,
-            fecha_nacimiento : "1998/10/22",
-            sexo: sex,
-            estado_civil, 
-            religion, 
-            ocupacion, 
-            lugar_nacimiento, 
-            residencia, 
-            domicilio, 
-            telefono, 
-            estado :'1',
-            imagen : image,
-            username,  
-            email,
-            password,
-        })
-        */
         Keyboard.dismiss();
     }
 
@@ -283,8 +247,8 @@ export const PerfilUsuario = () => {
                                             (Platform.OS === 'ios') && loginStyles.inputFieldIOS
                                         ]}
                                 selectionColor='white'
-                                onChangeText={ (value) => onChange(value, 'cedula')}
-                                value = {cedula}  
+                                onChangeText={ (value) => onChange(value, 'cedula_identidad')}
+                                value = {cedula_identidad}  
                                 onSubmitEditing={onEdit}
                                 autoCorrect={false}
                                 
@@ -292,126 +256,7 @@ export const PerfilUsuario = () => {
                                 editable = {editState.edit}
                             />
 
-                            <Text style={loginStyles.label}>Estado civil</Text>
-                            <TextInput
-                                placeholder='Ingrese su estado civil'
-                                placeholderTextColor = 'rgba(255,255,255,0.4)'
                             
-                                underlineColorAndroid="white"
-                                style = {[
-                                            loginStyles.inputField,
-                                            (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                        ]}
-                                selectionColor='white'
-                                onChangeText={ (value) => onChange(value, 'estado_civil')}
-                                value = {estado_civil}  
-                                onSubmitEditing={onEdit}
-                                autoCapitalize='none'
-                                autoCorrect={false}
-                                
-                                selectTextOnFocus = {editState.edit}
-                                editable = {editState.edit}
-                            />
-                            <Text style={loginStyles.label}>Religión</Text>
-                            <TextInput
-                                placeholder='Ingrese su religión'
-                                placeholderTextColor = 'rgba(255,255,255,0.4)'
-
-                                underlineColorAndroid="white"
-                                style = {[
-                                            loginStyles.inputField,
-                                            (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                        ]}
-                                selectionColor='white'
-                                onChangeText={ (value) => onChange(value, 'religion')}
-                                value = {religion}  
-                                onSubmitEditing={onEdit}
-                                autoCapitalize='none'
-                                autoCorrect={false}
-                                
-                                selectTextOnFocus = {editState.edit}
-                                editable = {editState.edit}
-                            />
-                            <Text style={loginStyles.label}>Ocupación</Text>
-                            <TextInput
-                                placeholder='Ingrese su ocupación'
-                                placeholderTextColor = 'rgba(255,255,255,0.4)'
-                                
-                                underlineColorAndroid="white"
-                                style = {[
-                                            loginStyles.inputField,
-                                            (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                        ]}
-                                selectionColor='white'
-                                onChangeText={ (value) => onChange(value, 'ocupacion')}
-                                value = {ocupacion}  
-                                onSubmitEditing={onEdit}
-                                autoCapitalize='none'
-                                autoCorrect={false}
-                                
-                                selectTextOnFocus = {editState.edit}
-                                editable = {editState.edit}
-                            />
-                            <Text style={loginStyles.label}>Lugar Nacimiento</Text>
-                            <TextInput
-                                placeholder='Ingrese su lugar de nacimiento'
-                                placeholderTextColor = 'rgba(255,255,255,0.4)'
-                                
-                                underlineColorAndroid="white"
-                                style = {[
-                                            loginStyles.inputField,
-                                            (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                        ]}
-                                selectionColor='white'
-                                onChangeText={ (value) => onChange(value, 'lugar_nacimiento')}
-                                value = {lugar_nacimiento}  
-                                onSubmitEditing={onEdit}
-                                autoCapitalize='none'
-                                autoCorrect={false}
-                                
-                                selectTextOnFocus = {editState.edit}
-                                editable = {editState.edit}
-                            />
-                            <Text style={loginStyles.label}>Residencia</Text>
-                            <TextInput
-                                placeholder='Ingrese su residencia'
-                                placeholderTextColor = 'rgba(255,255,255,0.4)'
-                
-                                underlineColorAndroid="white"
-                                style = {[
-                                            loginStyles.inputField,
-                                            (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                        ]}
-                                selectionColor='white'
-                                onChangeText={ (value) => onChange(value, 'residencia')}
-                                value = {residencia}  
-                                onSubmitEditing={onEdit}
-                                autoCapitalize='none'
-                                autoCorrect={false}
-                                
-                                selectTextOnFocus = {editState.edit}
-                                editable = {editState.edit}
-                            />
-                            <Text style={loginStyles.label}>Domicilio</Text>
-                            <TextInput
-                                placeholder='Ingrese su domicilio'
-                                placeholderTextColor = 'rgba(255,255,255,0.4)'
-                        
-                                underlineColorAndroid="white"
-                                style = {[
-                                            loginStyles.inputField,
-                                            (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                        ]}
-                                selectionColor='white'
-                                onChangeText={ (value) => onChange(value, 'domicilio')}
-                                value = {domicilio}  
-                                onSubmitEditing={onEdit}
-                                autoCapitalize='none'
-                                autoCorrect={false}
-                                
-                                selectTextOnFocus = {editState.edit}
-                                editable = {editState.edit}
-                            />
                             <Text style={loginStyles.label}>Telefono</Text>
                             <TextInput
                                 placeholder='Ingrese su telefono'
@@ -456,9 +301,7 @@ export const PerfilUsuario = () => {
                                 }}
                                 source ={{uri: image ? image : user.imagen}}
                                 
-                            >
-                                
-                            </Image>
+                            />
 
 
                             <Text style={loginStyles.label}>Username</Text>
