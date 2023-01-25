@@ -4,24 +4,20 @@ export interface LoginResponse {
 }
 
 export interface Usuario {
-    _id : string;
-    nombre: string;
-    cedula : string;
+    id : string;
+    primer_nombre : string;
+    segundo_nombre : string;
+    apellido_paterno : string;
+    apellido_materno : string;
+    cedula_identidad : string;
     fecha_nacimiento : string;
-    sexo : boolean;
-    estado_civil : string;
-    religion : string
-    ocupacion : string
-    lugar_nacimiento : string
-    residencia : string
-    domicilio : string 
-    telefono : string 
-    fecha_actual : string 
-    estado : boolean
-    imagen : string
-    username : string 
-    email : string
-
+    sexo : string;
+    telefono : string;
+    estado : string;
+    imagen : string;
+    username : string;
+    email : string;
+    role : Role;
 }
 
 export interface LoginData {
@@ -115,15 +111,24 @@ export interface IdUsuario {
     nombre: string;
 }
 
-export interface IdProfesional {
-    _id: string;
-    nombre_profesional: string;
-    apellido_profesional: string;
+export interface Profesional {
+    id : string;
+    nombre_profesional:string;
+    apellido_profesional:string;
+    cedula_profesional:string;
+    telefono_profesional:string;
+    direccion_profesional:string;
+    correo_profesional:string;
+    imagen_profesional:string;
+    estado_profesional:boolean;
+    especialidad : Especialidad
 }
 
-export interface IdEspecialidad {
-    _id: string;
+export interface Especialidad {
+    id: string;
     nombre_especialidad: string;
+    estado_especialidad : boolean;
+    consultorio : Consultorio
 }
 
 export interface IdConsultorio {
@@ -138,8 +143,7 @@ export interface ReservaCita {
     fecha_hora_fin_reserva: string;
     estado_reserva: string;
     id_usuario: IdUsuario;
-    id_profesional: IdProfesional;
-    id_especialidad: IdEspecialidad;
+    id_profesional: Profesional;
     id_consultorio: IdConsultorio;
 }
 
@@ -159,15 +163,25 @@ export interface IdProfesionalGenerar {
 export interface IdEspecialidadGenerar {
     _id: string;
     nombre_especialidad: string;
-    id_profesional: IdProfesional[];
+    id_profesional: Profesional[];
     estado_especialidad: string;
 }
 
 export interface Consultorio{
-    _id: string;
+    id : string;
     nombre_consultorio: string;
+    descripcion_consultorio : string;
+    imagen_consultorio : string;
     direccion_consultorio: string;
     horario_atencion_consultorio: string;
-    id_especialidad: IdEspecialidad[];
     estado_consultorio: boolean;
+}
+export enum EstadoReserva {
+    COMPLETADO="ACEPTADO",
+    PENDIENTE="PENDIENTE",
+    CANCELADO="CANCELADO"
+}
+export interface Role {
+    id:string
+    nombreRol:string
 }
