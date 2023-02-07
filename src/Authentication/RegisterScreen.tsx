@@ -156,8 +156,8 @@ export const RegisterScreen = ({navigation} : Props) => {
                           keyPrefix: "mobile/",
                           bucket: 'dermatologiahg',
                           region: 'sa-east-1',
-                          accessKey: 'AKIAQAUKBNLWM74VTENB',
-                          secretKey: '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',
+                          accessKey: 'AKIAXT7WDEXXZM66SP4S',
+                          secretKey: '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',
                           successActionStatus: 201
                    } 
 
@@ -299,122 +299,8 @@ export const RegisterScreen = ({navigation} : Props) => {
                                     dayOfWeekFormat='long'
                                 />
                             )}
-                        {/*SEXO*/}
-                        
-                        <Text style={loginStyles.label}>Sexo</Text>
-                        <Picker
-                            selectedValue={sex}
-                            onValueChange={(itemValue, itemIndex) =>
-                                setSex(itemValue)
-                            }
-                            style={loginStyles.label}    
-                        >
-                            <Picker.Item label="Masculino" value="1" />
-                            <Picker.Item label="Femenino" value="0" />
-                        </Picker>
 
-                        <Text style={loginStyles.label}>Estado civil</Text>
-                        <TextInput
-                            placeholder='Ingrese su estado civil'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
                         
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'estado_civil')}
-                            value = {estado_civil}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        <Text style={loginStyles.label}>Religión</Text>
-                        <TextInput
-                            placeholder='Ingrese su religión'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'religion')}
-                            value = {religion}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        <Text style={loginStyles.label}>Ocupación</Text>
-                        <TextInput
-                            placeholder='Ingrese su ocupación'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                            
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'ocupacion')}
-                            value = {ocupacion}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        <Text style={loginStyles.label}>Lugar Nacimiento</Text>
-                        <TextInput
-                            placeholder='Ingrese su lugar de nacimiento'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                            
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'lugar_nacimiento')}
-                            value = {lugar_nacimiento}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        <Text style={loginStyles.label}>Residencia</Text>
-                        <TextInput
-                            placeholder='Ingrese su residencia'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-            
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'residencia')}
-                            value = {residencia}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        <Text style={loginStyles.label}>Domicilio</Text>
-                        <TextInput
-                            placeholder='Ingrese su domicilio'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                    
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'domicilio')}
-                            value = {domicilio}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
                         <Text style={loginStyles.label}>Telefono</Text>
                         <TextInput
                             placeholder='Ingrese su telefono'
