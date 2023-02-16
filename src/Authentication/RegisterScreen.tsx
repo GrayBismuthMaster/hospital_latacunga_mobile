@@ -24,12 +24,13 @@ interface Props extends NativeStackScreenProps<RootStackParams,'LoginScreen'>{};
 export const RegisterScreen = ({navigation} : Props) => {
     
     //CUSTOM HOOK PARA S3 UPLOAD
-    const { s3State, setS3State, formatFilename, uploadToS3, getBlob} = useS3Upload();
+    const { formatFilename, uploadToS3} = useS3Upload();
     //FIN CUSTOM HOOK
 
     //CONTEXT
     const {signUp} = useContext(AuthContext);
 
+    const [buttonState, setButtonState] = useState(false);
 
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('date');
@@ -128,6 +129,7 @@ export const RegisterScreen = ({navigation} : Props) => {
                     }
                 }
                 onSubmit = {(values, {resetForm} )=>{
+                    setButtonState(true);
                     //IMAGE URI, VALUES TEXT, 
                     console.log('valores del form',values);
                     console.log('datos imagen', fullImageData);
@@ -156,7 +158,7 @@ export const RegisterScreen = ({navigation} : Props) => {
                         const resUpload = await uploadToS3(fullImageData.uri, signedRequest);
                         console.log("RESPUESTA DE S3", resUpload, "URL", url);
                             
-                            
+                            setButtonState(false);
                             await signUp({
                                 primer_nombre,
                                 segundo_nombre,
@@ -274,7 +276,7 @@ export const RegisterScreen = ({navigation} : Props) => {
                                     {/* FIN IMAGEN  */}
                                     
                                     <Button
-                                        disabled = {image  ? image.length === 0  ? true : false: true} 
+                                        disabled = {image  ? image.length === 0 || buttonState  ? true : false: true} 
                                         onPress={handleSubmit} 
                                         title="Submit" 
                                     />
