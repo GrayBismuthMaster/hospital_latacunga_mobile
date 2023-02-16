@@ -31,22 +31,31 @@ export const AuthProvider = ({children} : any)=>{
     },[])    
     //Verificar token 
     const checkToken = async() =>{
-        const tokenVerificado = await AsyncStorage.getItem('token');
-        console.log("token verificado")
-        console.log(tokenVerificado)
-        if(!tokenVerificado){
-            return dispatch({type: 'notAuthenticated'})
-        }
-        const resp = await HospitalLatacungaApi.get('/auth/verify')
-        console.log("respuesta de verificacione de token ", resp.data);
-        
-        dispatch({
-            type: 'signUp',
-            payload :{
-                token: resp.data.token ,
-                user : resp.data.user
+        try {
+            const tokenVerificado = await AsyncStorage.getItem('token');
+            console.log("token verificado")
+            console.log(tokenVerificado)
+            if(!tokenVerificado){
+                return dispatch({type: 'not-authenticated'})
             }
-        })
+            const resp = await HospitalLatacungaApi.get('/auth/verify')
+            console.log("respuesta de verificacione de token ", resp);
+           
+            dispatch({
+                type: 'signUp',
+                payload :{
+                    token: resp.data.token ,
+                    user : resp.data.user
+                }
+            })    
+        } catch (error) {
+            console.log('error desde verif',error);
+                dispatch({
+                    type : 'not-authenticated',
+                })
+            
+        }
+        
         
     }
 
@@ -73,23 +82,25 @@ export const AuthProvider = ({children} : any)=>{
             dispatch({type : 'addError', payload: errorMessage || 'información incorrecta'})
         }
    }
-   const  signUp = async ({nombre, cedula, fecha_nacimiento, sexo, estado_civil, religion, ocupacion, lugar_nacimiento, residencia, domicilio, telefono, estado, imagen, username, email, password} : RegisterData)=> {
+   const  signUp = async (data : RegisterData)=> {
         try{
-            const resp = await HospitalLatacungaApi.post('/auth/signup', {nombre, cedula, fecha_nacimiento, sexo, estado_civil, religion, ocupacion, lugar_nacimiento, residencia, domicilio, telefono, estado, imagen, username, email, password})
-            console.log(resp.data);
-            const token = resp.data.token;
-            const user = resp.data.datosUsuario;
-            dispatch({
-                type: 'signUp',
-                payload :{
-                    token ,
-                    user
-                }
-            })
+            const resp = await HospitalLatacungaApi.post('/usuarios', data)
+            //  ESTE ES EL IDEAL CON AUTH PARA EL TOKEM PERO POR AHORA ASI 
+            // const resp = await HospitalLatacungaApi.post('/auth/signup', data);
 
-            await AsyncStorage.setItem('token',token);
+            console.log('respuesta de servidor ',resp.data);
+
+            // dispatch({
+            //     type: 'signUp',
+            //     payload :{
+            //         token ,
+            //         user
+            //     }
+            // })
+
+            // await AsyncStorage.setItem('token',token);
         }catch(error:any){
-            console.log(error);
+            console.log('error en registor', error);
             const errorMessage = error.message;
             dispatch({type : 'addError', payload: errorMessage || 'información incorrecta'})
         }

@@ -28,22 +28,20 @@ export interface LoginData {
 
 
 export interface RegisterData {
-    nombre: string;
-    cedula : string;
-    fecha_nacimiento : string;
-    sexo : boolean;
-    estado_civil : string;
-    religion : string
-    ocupacion : string
-    lugar_nacimiento : string
-    residencia : string
-    domicilio : string 
-    telefono : string 
-    estado : string
-    imagen : string
-    username : string 
-    email : string
-    password : string
+    primer_nombre : string;
+    segundo_nombre : string;
+    apellido_paterno : string;
+    apellido_materno : string;
+    cedula_identidad : string;
+    email : string;
+    username : string;
+    password : string;
+    telefono : string;
+    imagen : string;
+    sexo : string;
+    fecha_nacimiento : Date;
+    id_rol : string;
+    estado : boolean
 }
 
 

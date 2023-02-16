@@ -1,7 +1,7 @@
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// const baseURL = 'http://3.12.17.53:5001/api'
-const baseURL = 'http://192.168.100.34:5001/api';
+// const baseURL = 'http://50.19.61.249:5002/api'
+const baseURL = 'https://server.cmedcita.com/api';
 
 const HospitalLatacungaApi = axios.create({baseURL});
 //Middleware para interceptar las solicitudes

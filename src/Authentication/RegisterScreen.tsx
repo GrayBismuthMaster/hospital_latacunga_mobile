@@ -12,16 +12,21 @@ import { RootStackParams } from '../Navigation/StackNavigator'
 import { loginStyles } from '../theme/loginTheme'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { styles } from '../theme/appTheme';
-import { Axios } from 'axios';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import {RegisterData} from '../interfaces/appInterfaces';
-import dermatologiaApi from '../api/HospitalLatacungaApi';
-//import fs from 'react-native-fs';
-import {RNS3} from 'react-native-aws3';
-
+import { Formik } from 'formik';
+import {UsuariosData} from '../data/UsuariosData';
+import { FieldFormik } from '../components/FormikFields/FieldFormik';
+import { formatTitle } from '../utils';
+import HospitalLatacungaApi from '../api/HospitalLatacungaApi';
+import { useS3Upload } from '../hooks/useS3Upload';
 interface Props extends NativeStackScreenProps<RootStackParams,'LoginScreen'>{};
 
 export const RegisterScreen = ({navigation} : Props) => {
+    
+    //CUSTOM HOOK PARA S3 UPLOAD
+    const { s3State, setS3State, formatFilename, uploadToS3, getBlob} = useS3Upload();
+    //FIN CUSTOM HOOK
+
     //CONTEXT
     const {signUp} = useContext(AuthContext);
 
@@ -31,7 +36,7 @@ export const RegisterScreen = ({navigation} : Props) => {
     const [show, setShow] = useState(false);
     const [dateText, setDateText] = useState('Empty');
     //SEX PICKER 
-    const [sex, setSex] = useState('');
+    const [sex, setSex] = useState('M');
     //IMAGE
     const [image, setImage]:any =useState();
     const [fullImageData , setFullImageData] : any = useState({});
@@ -62,15 +67,16 @@ export const RegisterScreen = ({navigation} : Props) => {
             }
         }
 
-        launchImageLibrary(options,response => {
+        launchImageLibrary((options as any),response => {
             if(response.errorCode){
                 console.log(response.errorMessage);
             } else if (response.didCancel){
                 console.log('Selección de usuario cancelada');
             } else {
-                const path = response.assets[0].uri;
+                const path = (response as any).assets[0].uri;
+                console.log('respuesta desde foto',response.assets);
                 setImage(path);
-                setFullImageData(response.assets[0]);
+                setFullImageData((response as any).assets[0]);
             }
         })
     }
@@ -85,347 +91,198 @@ export const RegisterScreen = ({navigation} : Props) => {
             includeBase64: true
         }
 
-        launchCamera(options, response =>{
+        launchCamera((options as any), response =>{
             if(response.errorCode){
                 console.log(response.errorMessage);
             } else if (response.didCancel){
                 console.log('Selección de usuario cancelada');
             } else {
-                const path = response.assets[0].uri;
+                const path = (response as any).assets[0].uri;
                 setImage(path);
-                setFullImageData(response.assets[0]);
+                setFullImageData((response as any).assets[0]);
+                    
+                // setFileName(e.target.files[0].name);
+                // setS3State({...s3State, file : e.target.files[0], name : e.target.files[0].name});
+                // formikProps.form.setFieldValue('imagen', e.target.files[0])
             }
         })
 
     }
     
 
-
-    //USEFORM
-    const {email, password, nombre, cedula, /*fecha_nacimiento,*/  estado_civil, religion, ocupacion, lugar_nacimiento, residencia, domicilio, telefono, estado,  username,onChange} = useForm({
-        email : '',
-        password : '',
-        nombre : '',
-        cedula : '',
-        /*fecha_nacimiento : '2018/10/22',*/
-        sexo : '',
-        estado_civil: '',
-        religion : '',
-        ocupacion : '',
-        lugar_nacimiento : '',
-        residencia : '',
-        domicilio : '',
-        telefono : '',
-        estado : '1',
-        username : '',
-    })
-
-    const onRegister = async () =>  {
-        /*
-        try{
-            const {data} = await dermatologiaApi.post('auth/signup', signUp)
-            dispatch ({
-                type: 'signUp',
-                payload : {
-                    token : data.token,
-                    user: data.datosUsuario
-                }
-            })
-        }catch(error){
-            console.log(error)
-        }
-        */
-                    console.log('Nombre arcuhiosd')
-                    console.log(fullImageData);
-                    /*
-                    const FileUpload = {
-                        file : {
-                            name : fullImageData.fileName,
-                            size: fullImageData.fileSize,  
-                            type : fullImageData.type,
-                            webkitRelativePath : fullImageData.uri, 
-                        }
-                    }
-                    */
-                   const file = {
-                        uri : fullImageData.uri,
-                        name : fullImageData.fileName,
-                        type : fullImageData.type,
-                   }
-                   const config = {
-                          keyPrefix: "mobile/",
-                          bucket: 'dermatologiahg',
-                          region: 'sa-east-1',
-                          accessKey: 'AKIAXT7WDEXXZM66SP4S',
-                          secretKey: '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',
-                          successActionStatus: 201
-                   } 
-
-                   RNS3.put(file, config)
-                   .then(response => {
-                       if (!response) return <div> Cargando .... </div>
-                       console.log(response.body.postResponse)
-                       console.log(response.body.postResponse.location)
-                       const linkImagen = response.body.postResponse.location;
-                       let booleanSex = false;
-                       if(sex === '0'){
-                            booleanSex = false
-                       }else{
-                           booleanSex = true
-                       }
-                       
-                       signUp({
-                            nombre,
-                            cedula,
-                            fecha_nacimiento : "1998/10/22",
-                            sexo: booleanSex,
-                            estado_civil, 
-                            religion, 
-                            ocupacion, 
-                            lugar_nacimiento, 
-                            residencia, 
-                            domicilio, 
-                            telefono, 
-                            estado :'1',
-                            imagen : linkImagen,
-                            username,  
-                            email,
-                            password,
-                        })
-                    })
-        /*
-
-       console.log(nombre,cedula,sex,estado_civil, religion,  ocupacion,lugar_nacimiento,  residencia, domicilio, telefono,  image,   username,     email,  password);
-        signUp({
-            nombre,
-            cedula,
-            fecha_nacimiento : "1998/10/22",
-            sexo: sex,
-            estado_civil, 
-            religion, 
-            ocupacion, 
-            lugar_nacimiento, 
-            residencia, 
-            domicilio, 
-            telefono, 
-            estado :'1',
-            imagen : image,
-            username,  
-            email,
-            password,
-        })
-        */
-        Keyboard.dismiss();
-    }
-    
-
     return (
             <>
             {/*BACKGROUND */}
-            
-            <Background/>
-            <KeyboardAvoidingView
-                    style = {{flex: 1, backgroundColor:'#5856D6'}}
-                    behavior = {Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-            <ScrollView>
-                
-                    <View style = {loginStyles.formContainer}>
-                        {/* Keyboard avoid view*/}
-                        <Logo/>
-                        <Text style={loginStyles.title}>Registro</Text>
-                        
-                        <Text style={loginStyles.label}>Nombres Completos</Text>
-                        <TextInput
-                            placeholder='Ingrese sus nombres'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                            
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'nombre')}
-                            value = {nombre}  
-                            onSubmitEditing={onRegister}
-                            autoCorrect={false}
-                        />
-                        <Text style={loginStyles.label}>Cedula</Text>
-                        <TextInput
-                            placeholder='Ingrese su cédula'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                            
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'cedula')}
-                            value = {cedula}  
-                            onSubmitEditing={onRegister}
-                            autoCorrect={false}
-                        />
-                        {/*FECHA NACIMIENTO */}
-                            <Text style = {{
-                                marginVertical: 10,
-                                fontWeight: 'bold',
-                                color:'white',
-                                fontSize: 20,
-                            }}>Fecha de Nacimiento</Text>
-                            <Text style = {{
-                                marginTop: 10,
-                                fontWeight: 'bold',
-                                color:'white',
-                                fontSize: 20,
-                            }}>{dateText}</Text>
-                            <View style = {{
-                                margin: 20
-                            }}>
-                                <Button
-                                    title="Fecha de Nacimiento"
-                                    onPress={() => showMode('date')}
-                                />
-                            </View>
-                            {show && (
-                                <DateTimePicker
-                                    testID="dateTimePicker"
-                                    timeZoneOffsetInMinutes={0}
-                                    value={date}
-                                    mode={mode}
-                                    display="default"
-                                    onChange={onChangeDate}
-                                    dayOfWeekFormat='long'
-                                />
-                            )}
+            <Formik
+                initialValues={
+                    {
+                        primer_nombre : '',
+                        segundo_nombre : '',
+                        apellido_paterno : '',
+                        apellido_materno : '',
+                        cedula_identidad : '',
+                        email : '',
+                        username : '',
+                        password : '',
+                        telefono : ''
+                    }
+                }
+                onSubmit = {(values, {resetForm} )=>{
+                    //IMAGE URI, VALUES TEXT, 
+                    console.log('valores del form',values);
+                    console.log('datos imagen', fullImageData);
+                    console.log('sexo', sex);
+                    console.log('fecha_nacimeinto', date);
 
-                        
-                        <Text style={loginStyles.label}>Telefono</Text>
-                        <TextInput
-                            placeholder='Ingrese su telefono'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                            
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'telefono')}
-                            value = {telefono}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        {/*ESTADO */}
-                        {/* IMAGEN */ }
-                        <Text style={[
-                            loginStyles.label,
-                            {marginBottom: 20}
-                        ]}>Imagen</Text>
-                        <Button
-                            title='Seleccionar de galería'
-                            onPress={selectImage}
-                        />
-                        <Text></Text>
-                        <Button
-                            title='Tomar foto'
-                            onPress={takePicture}
-                        />
-                        <Image 
-                            style={{
-                                alignSelf: 'center',
-                                width: 100,
-                                height: 100,
-                                marginVertical: 30
-                            }}
-                            source ={{uri : image}}
-                            
-                        >
-                            
-                        </Image>
-
-
-                        <Text style={loginStyles.label}>Username</Text>
-                        <TextInput
-                            placeholder='Ingrese su nombre de Usuario'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                        
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'username')}
-                            value = {username}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        <Text style={loginStyles.label}>Email</Text>
-                        <TextInput
-                            placeholder='Ingrese su email'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                            keyboardType='email-address'
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'email')}
-                            value = {email}  
-                            onSubmitEditing={onRegister}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        <Text style={loginStyles.label}>Contraseña</Text>
-                        <TextInput
-                            placeholder='Ingrese su contraseña'
-                            placeholderTextColor = 'rgba(255,255,255,0.4)'
-                            
-                            underlineColorAndroid="white"
-                            style = {[
-                                        loginStyles.inputField,
-                                        (Platform.OS === 'ios') && loginStyles.inputFieldIOS
-                                    ]}
-                            selectionColor='white'
-                            onChangeText={ (value) => onChange(value, 'password')}
-                            value = {password}     
-                            secureTextEntry
-                            onSubmitEditing={onRegister}  
-                        />
-
-                        {/*Button Login */}
-                        <View 
-                            style = {loginStyles.buttonContainer}
-                        >
-                            <TouchableOpacity
-                                activeOpacity={0.8}
-                                style = {loginStyles.button}
-                                onPress = {onRegister}
-                            >
-                                <Text style = {loginStyles.buttonText}>Registrarse</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style = {loginStyles.newUserContainer}>
-                                    <TouchableOpacity
-                                        activeOpacity={.8}
-                                        onPress ={()=>{navigation.replace('LoginScreen')}}
-                                    >
-                                        <Text style = {loginStyles.buttonText}>¿Ya tienes una cuenta?</Text>
-                                    </TouchableOpacity>
-                        </View>
-                    </View>
+                    const {
+                        primer_nombre,
+                        segundo_nombre,
+                        apellido_paterno,
+                        apellido_materno,
+                        cedula_identidad,
+                        email,
+                        username,
+                        password,
+                        telefono
+                    } = values;
                     
-            </ScrollView>
-            
-            </KeyboardAvoidingView>
-           
-        
+                    HospitalLatacungaApi.post('/uploads/signS3',{
+                        fileName :formatFilename(fullImageData.fileName),
+                        fileType : fullImageData.type
+                    }).then(async (res)=>{
+                        console.log("respues",res);
+                        const { signedRequest, url } = res.data;
+                        // const body = await getBlob(fullImageData.uri);
+                        const resUpload = await uploadToS3(fullImageData.uri, signedRequest);
+                        console.log("RESPUESTA DE S3", resUpload, "URL", url);
+                            
+                            
+                            await signUp({
+                                primer_nombre,
+                                segundo_nombre,
+                                apellido_paterno,
+                                apellido_materno,
+                                cedula_identidad,
+                                email,
+                                username,
+                                password,
+                                telefono,
+                                imagen : url, 
+                                sexo  : sex, 
+                                fecha_nacimiento : date,
+                                estado : true,
+                                id_rol : '2'
+                            });
+                            await navigation.navigate('LoginScreen');
+                            Keyboard.dismiss();
+                    })
+                }}
+            >
+                {({ handleChange, handleBlur, handleSubmit, values }) => (
+                    <KeyboardAvoidingView
+                        style = {{flex: 1, backgroundColor:'#5856D6'}}
+                        behavior = {Platform.OS === 'ios' ? 'padding' : 'height'}
+                    >
+                        <ScrollView>
+                                <View style = {loginStyles.formContainer}>
+                                    {/* <Text style={loginStyles.title}>Registro</Text> */}
+                                    {
+                                        UsuariosData.map((valores:any, index : number)=>{
+                                            return (
+                                                <FieldFormik
+                                                    name = {valores.name}
+                                                    nombre = {formatTitle(valores.name)}
+                                                    type = {valores.type}
+                                                    key = {index}
+                                                />
+                                            )
+                                        })
+                                    }
+                                    {/*SEXO*/}
+                                
+                                    <Text style={loginStyles.label}>Sexo</Text>
+                                    <Picker
+                                        selectedValue={sex}
+                                        onValueChange={(itemValue, itemIndex) =>
+                                            setSex(itemValue)
+                                        }
+                                        style={loginStyles.label}    
+                                    >
+                                        <Picker.Item label="Masculino" value="M" />
+                                        <Picker.Item label="Femenino" value="F" />
+                                    </Picker>
+                                    {/* FIN SEXO  */}
+
+                                    {/*FECHA NACIMIENTO */}
+                                    <Text style = {{
+                                        marginVertical: 10,
+                                        fontWeight: 'bold',
+                                        color:'white',
+                                        fontSize: 20,
+                                    }}>Fecha de Nacimiento</Text>
+                                    <Text style = {{
+                                        marginTop: 10,
+                                        fontWeight: 'bold',
+                                        color:'white',
+                                        fontSize: 20,
+                                    }}>{dateText}</Text>
+                                    <View style = {{
+                                        margin: 20
+                                    }}>
+                                        <Button
+                                            title="Fecha de Nacimiento"
+                                            onPress={() => showMode('date')}
+                                        />
+                                    </View>
+                                    {show && (
+                                        <DateTimePicker
+                                            testID="dateTimePicker"
+                                            timeZoneOffsetInMinutes={0}
+                                            value={date}
+                                            mode={"date"}
+                                            display="default"
+                                            onChange={onChangeDate}
+                                            // dayOfWeekFormat='long'
+                                        />
+                                    )}
+                                    {/* FIN FECHA DE NACIMIENTO  */}
+                                    {/* IMAGEN  */}
+
+                                        <Text style={[
+                                            loginStyles.label,
+                                            {marginBottom: 20}
+                                        ]}>Imagen</Text>
+                                        <Button
+                                            title='Seleccionar de galería'
+                                            onPress={selectImage}
+                                        />
+                                        <Text></Text>
+                                        <Button
+                                            title='Tomar foto'
+                                            onPress={takePicture}
+                                        />
+                                        <Image 
+                                            style={{
+                                                alignSelf: 'center',
+                                                width: 100,
+                                                height: 100,
+                                                marginVertical: 30
+                                            }}
+                                            source ={{uri :image ?  image : ''}}
+                                            
+                                        />
+                                    {/* FIN IMAGEN  */}
+                                    
+                                    <Button
+                                        disabled = {image  ? image.length === 0  ? true : false: true} 
+                                        onPress={handleSubmit} 
+                                        title="Submit" 
+                                    />
+                                </View>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
+                )}
+            </Formik>
         </>
         )
-
 }

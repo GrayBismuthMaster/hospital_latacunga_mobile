@@ -11,7 +11,7 @@ type AuthAction =
     | { type: 'signUp', payload : {token: string, user: Usuario}}
     | {type: 'addError', payload: string}
     | {type : 'removeError'}
-    | {type: 'notAuthenticated'}
+    | {type: 'not-authenticated'}
     | {type : 'logout'}
     | {type : 'editUser', payload : Usuario}
 
@@ -41,7 +41,7 @@ export const authReducer = (state : AuthState, action : AuthAction) : AuthState 
             }
             
         case 'logout' :
-        case 'notAuthenticated' :
+        case 'not-authenticated' :
             return {
                 ...state,
                 status : 'not-authenticated',

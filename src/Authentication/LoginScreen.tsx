@@ -100,7 +100,8 @@ export const LoginScreen = ({navigation} : any) => {
                             onChangeText={ (value) => onChange(value, 'password')}
                              value = {password}     
                              secureTextEntry
-                             onSubmitEditing={onLogin}  
+                             onSubmitEditing={onLogin} 
+                             autoCapitalize = 'none' 
                         />
 
                         {/*Button Login */}
