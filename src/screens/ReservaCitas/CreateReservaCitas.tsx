@@ -9,6 +9,8 @@ import { formatearFecha } from '../../utils/formatearFecha';
 import {DateTimePickerComponent} from '../../components/DateTimePicker';
 import { AuthContext } from '../../context/AuthContext';
 import { LoadingScreen } from '../Navigation/LoadingScreen';
+import { formatearHorasFecha } from '../../utils';
+import { ReservaCitaContext } from '../../context/ReservaCitaContext';
 
 interface Props {
   isVisible : boolean;
@@ -22,7 +24,11 @@ export const CreateReservaCitas = ({isVisible, setIsVisible}: Props) => {
   if(!user){
       return <LoadingScreen/>
   }
-
+  //STATE GLOBAL CREATE
+  
+    //Context para la foto de perfil 
+    const {createReservaCita} = useContext(ReservaCitaContext)
+    
   //MOTIVO RESERVA
   const [motivoReserva , setMotivoReserva] = useState("");
   //DROPDOWN RESERVA CITAS 
@@ -95,22 +101,25 @@ export const CreateReservaCitas = ({isVisible, setIsVisible}: Props) => {
     let id_profesional = JSON.parse(selectedProfesional);
     // console.log(`${initialTime.toLocaleString()} - ${date.setTime(initialTime)}`)
     // console.log('motivo reserva : ',motivoReserva,'fecha inicio reserva', initialTime, 'fecha hora fin reserva', endTime, 'estado reserva', EstadoReserva.PENDIENTE, 'id usuario reserva', user.id , 'id_especialidad reserva cita', selectedEspecialidad, 'id consultorio', selectedConsultorio, 'id profesional', id_profesional.id)
-    HospitalLatacungaApi.post('/reservasCitas',{
+      
+    //CREAR HORAS PARA LA FECHA 
+    console.log('FECHA ESCOGIDA', date); 
+    console.log('Hora de inicio escogida', initialTime.toLocaleTimeString());
+    let fecha_hora_inicio_reserva = formatearHorasFecha(date, initialTime);
+    let fecha_hora_fin_reserva = formatearHorasFecha(date, endTime);
+    createReservaCita({
       motivo_reserva : motivoReserva,
-      fecha_hora_inicio_reserva : initialTime,
-      fecha_hora_fin_reserva : endTime,
+      fecha_hora_inicio_reserva,
+      fecha_hora_fin_reserva,
       estado_reserva : EstadoReserva.PENDIENTE,
       id_usuario_reserva_cita : user.id,
       id_especialidad_reserva_cita : selectedEspecialidad,
       id_profesional_reserva_cita : id_profesional.id,
-      id_consultorio_reserva_cita : selectedConsultorio
+      id_consultorio_reserva_cita : selectedConsultorio 
     })
-    .then((reservaCita)=>{
-      console.log(reservaCita.data);
-      
-    })
+    setIsVisible(false);
   }
-  
+
   return (
         <Modal
             animationType='fade'
@@ -186,6 +195,7 @@ export const CreateReservaCitas = ({isVisible, setIsVisible}: Props) => {
                       dateTime={initialTime}
                       setDateTime = {setInitialTime}
                       modeParent = {'time'}
+
                     />
                     <DateTimePickerComponent
                       title='Hora final de cita'

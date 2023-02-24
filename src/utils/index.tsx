@@ -13,3 +13,10 @@ export const calcularEdad = (fecha:Date)=> {
 export const formatTitle = (keys:any)=>{
     return keys.replace(/_/gi,' ').toUpperCase();
 }
+export const formatearHorasFecha = (fecha:Date, hora: Date)=>{
+
+    let setHora = new Date(fecha.setHours(hora.getHours()));
+    let setMinutes = new Date(setHora.setMinutes(hora.getMinutes()));
+    let setSeconds = new Date(setMinutes.setSeconds(hora.getSeconds()));
+    return setSeconds;
+}

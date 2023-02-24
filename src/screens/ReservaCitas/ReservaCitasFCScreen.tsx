@@ -9,6 +9,7 @@ import { Fab } from '../../components/Fab';
 import { AuthContext } from '../../context/AuthContext';
 import { LoadingScreen } from '../Navigation/LoadingScreen';
 import { CreateReservaCitas } from './CreateReservaCitas';
+import { ReservaCitaContext } from '../../context/ReservaCitaContext';
 
 let { width } = Dimensions.get('window')
 
@@ -44,59 +45,91 @@ export const ReservaCitasFCScreen: React.FC = () => {
 
   //MOTIVO DE LA RESERVA
   const [motivoReserva, setMotivoReserva] = useState('');
+
+  //CONTEXT
+  
+    //Context para la foto de perfil 
+    const {fetchReservasCitasByUserId, reservaCita} = useContext(ReservaCitaContext)
+    
+    const [reservasCitas , setReservasCitas] = useState([]);
+  
   const createReserva = () =>{
     setIsVisible(true);
   }
+
   useEffect(() => {
+    console.log(user.id);
+    getData();
+    console.log('estado',reservaCita);
+    return ()=>{
+
+    }
+  }, []);
+  useEffect(()=>{
+    console.log('se refresca por reserva global')
     
     getData();
-  }, []);
+    return ()=>{
+
+    }
+  },[reservaCita!==null ? Object.values(reservaCita).length : null])
+  useEffect(()=>{
+    console.log('refresh por reserva')
+    
+    console.log('estado',reservaCita);
+    // console.log('reservas en estado local', reservasCitas)
+    async function setData (){
+      // const response = await HospitalLatacungaApi.get('/reservasCitas/');
+        const data: ReservaCita[] = Object.values(reservaCita);
+        console.log('data desde reserva cita fc')
+        console.log(data);
+        const mappedData =await data.map((reserva, index) => {
+            return {
+            ...reserva,
+            date: format(new Date(reserva.fecha_hora_inicio_reserva), 'yyyy-MM-dd'),
+            };
+        });
+
+        const reduced = await mappedData.reduce(
+            (acc: {[key: string]: ReservaCita[]}, currentItem) => {
+            const {date, ...coolItem} = currentItem;
+
+            acc[date] = [coolItem];
+
+            return acc;
+            },
+            {},
+        );
+
+        setItems(reduced);
+        
+        const mapHoras = () =>{
+            //const horas: {[key: string]: ReservaCita[]} = {};
+            const horitas = data.map((reserva, index) => {
+                return ({
+                    start :new Date(reserva.fecha_hora_inicio_reserva).toUTCString(),
+                    end : new Date(reserva.fecha_hora_fin_reserva).toUTCString(),
+                    title : reserva.motivo_reserva,
+                    summary : reserva.usuario_reserva_cita.primer_nombre
+                })
+                // setHoras({...horas, start : reserva.fecha_hora_inicio_reserva, end : reserva.fecha_hora_fin_reserva, title : reserva.motivo_reserva, summary : reserva.id_usuario.nombre})
+            });
+            console.log('las horas de aksad')
+            console.log(horitas);
+            setHoras(horitas);
+        }
+        mapHoras();
+    }
+    setData(reservaCita)
+    return ()=>{
+
+    }
+  },[reservasCitas])
 
   const getData = async () => {
-        
-    const response = await HospitalLatacungaApi.get('/reservasCitas/');
-      const data: ReservaCita[] = await response.data;
-      console.log('data desde reserva cita fc')
-      console.log(data);
-      const mappedData =await data.map((reserva, index) => {
-          return {
-          ...reserva,
-          date: format(new Date(reserva.fecha_hora_inicio_reserva), 'yyyy-MM-dd'),
-          };
-      });
-
-      const reduced = await mappedData.reduce(
-          (acc: {[key: string]: ReservaCita[]}, currentItem) => {
-          const {date, ...coolItem} = currentItem;
-
-          acc[date] = [coolItem];
-
-          return acc;
-          },
-          {},
-      );
-
-      setItems(reduced);
-      
-      const mapHoras = () =>{
-          //const horas: {[key: string]: ReservaCita[]} = {};
-          const horitas = data.map((reserva, index) => {
-              return ({
-                  start :new Date(reserva.fecha_hora_inicio_reserva).toUTCString(),
-                  end : new Date(reserva.fecha_hora_fin_reserva).toUTCString(),
-                  title : reserva.motivo_reserva,
-                  summary : reserva.usuario_reserva_cita.primer_nombre
-              })
-              // setHoras({...horas, start : reserva.fecha_hora_inicio_reserva, end : reserva.fecha_hora_fin_reserva, title : reserva.motivo_reserva, summary : reserva.id_usuario.nombre})
-          });
-          console.log('las horas de aksad')
-          console.log(horitas);
-          setHoras(horitas);
-      }
-      mapHoras();
-
-        
-
+    await fetchReservasCitasByUserId(user.id);
+    setReservasCitas(reservaCita);
+    
   };
 
   const renderItem = (item: ReservaCita) => {

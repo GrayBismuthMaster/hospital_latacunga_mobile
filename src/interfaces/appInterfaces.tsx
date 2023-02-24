@@ -105,7 +105,7 @@ export interface MenuItem {
     INTERFACES DE CITAS
 */
 export interface IdUsuario {
-    _id: string;
+    id: string;
     nombre: string;
 }
 
@@ -136,13 +136,14 @@ export interface IdConsultorio {
 
 export interface ReservaCita {
     motivo_reserva: string;
-    id: string;
-    fecha_hora_inicio_reserva: string;
-    fecha_hora_fin_reserva: string;
+    id?: string;
+    fecha_hora_inicio_reserva: Date;
+    fecha_hora_fin_reserva: Date;
     estado_reserva: string;
-    id_usuario: IdUsuario;
-    id_profesional: Profesional;
-    id_consultorio: IdConsultorio;
+    id_usuario_reserva_cita: string;
+    id_especialidad_reserva_cita ?: string;
+    id_profesional_reserva_cita ?: string;
+    id_consultorio_reserva_cita? : string;
 }
 
 //CONSULTORIOS

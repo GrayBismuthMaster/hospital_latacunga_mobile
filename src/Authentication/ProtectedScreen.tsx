@@ -16,7 +16,7 @@ export const ProtectedScreen = () => {
            
            <Drawer.Navigator
                 // drawerType={width >= 768 ? 'permanent' : 'front'}
-                // drawerContent = { (props:any)=> <MenuInterno {...props}/>}
+                drawerContent = { (props:any)=> <MenuInterno {...props}/>}
                 screenOptions = {{
                     headerShown: false
                 }}

@@ -33,13 +33,14 @@ export const DateTimePickerComponent = ({title, setDateTime, dateTime, modeParen
       }
 
         {/* START TIME PICKER */}
-        const onChangeTime = (event : any, selectedTime : any) => {
+        const onChangeTime = (event : any, selectedTime : Date) => {
             
             setShow(false);
             const fTimeAMPM = formatearFecha(selectedTime);
             // console.log(fTimeAMPM);
             // setShowStartTime(Platform.OS === 'ios');
-            setDateTime(selectedTime);
+            setDateTime(new Date(selectedTime.setHours(selectedTime.getHours()+5)));
+            // console.log('tiempo seleccionado',new Date().toLocaleTimeString())
             setDateTimeText(fTimeAMPM);
         }
 
@@ -74,6 +75,8 @@ export const DateTimePickerComponent = ({title, setDateTime, dateTime, modeParen
                                     display="default"
                                     onChange={mode === 'date'? onChangeDate : onChangeTime}
                                     dayOfWeekFormat='long'
+                                    is24Hour
+                                    
                                 />
                     )
                 }
